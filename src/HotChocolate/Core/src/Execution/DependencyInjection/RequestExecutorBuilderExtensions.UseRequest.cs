@@ -132,6 +132,10 @@ public static partial class RequestExecutorBuilderExtensions
         this IRequestExecutorBuilder builder) =>
         builder.UseRequest<WritePersistedQueryMiddleware>();
 
+    public static IRequestExecutorBuilder UseQueryResultCache(
+            this IRequestExecutorBuilder builder) =>
+            builder.UseRequest<QueryResultCacheMiddleware>();
+
     public static IRequestExecutorBuilder UseDefaultPipeline(
         this IRequestExecutorBuilder builder)
     {
