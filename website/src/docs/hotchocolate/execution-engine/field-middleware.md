@@ -2,19 +2,50 @@
 title: Field middleware
 ---
 
-TODO introduce field middleware
+The field middleware is one of the fundamental components in Hot Chocolate. Many features that you use like the data middleware, `UsePagination` or `UseProjections` for instance, are a field middleware. A resolver is the last component of a field middleware.
 
-# Execution order
+All the middleware that are applied to a field are compiled into one delegate that can be executed. Each middleware knows about the next middleware component in its chain and can choose to
+- execute logic before it
+- execute logic after it
+- not execute it
 
-TODO diagram, data middleware, why order matters
+Each middleware component also has access to an `IMiddlewareContext`. The `IMiddlewareContext` implements the `IResolverContext` interface so you can use all of the `IResolverContext` APIs in your middleware, similarly to how you would use them in your resolver code. There are also some special properties like the `Result`, which holds the resolver or middleware computed result.
+
+# Middleware order
+
+If you have used Hot Chocolate's data middleware before you might have encountered warnings about the order of middleware. The order is important, since it determines in which order the middleware are executed, e.g. in which order the resolver result is being processed. Take the `UsePagination` and `UseFiltering` middleware for example: Does it make sense to first paginate and then filter? No. It should first be filtered and then paginated. That's why the correct order is `UsePagination` --> `UseFiltering`. 
+
+```csharp
+descriptor
+    .UsePagination()
+    .UseFiltering()
+    .Resolve(context => 
+    {
+        // Omitted code for brevity
+    });
+```
+
+But hold up isn't this the opposite order of what we've just described?
+
+Lets look at a visualization to understand why it is indeed the correct order.
+
+<!-- todo: not visually verified -->
+
+```mermaid
+sequenceDiagram
+    UsePagination->>UseFiltering: next(context)
+    UseFiltering->>Resolver: next(context)
+    Resolver->>UseFiltering: Result of the Resolver
+    UseFiltering->>UsePagination Result of UseFiltering
+```
+
+As you can see in the graphic, the result of the resolver flows backwards through the middleware. The middleware is executed in the order it is defined, but the result produced by the last middleware, the field resolver, is sent back to first middleware in reverse order.
+
+If you think about it 
 
 # Definition
 
-Field middleware can be defined either as a delegate or as a separate type. In both cases we gain access to a `FieldDelegate` (`next`) and the `IMiddlewareContext` (`context`).
-
-The `IMiddlewareContext` implements the `IResolverContext` interface so you can use all of the `IResolverContext` APIs in your middleware, similarly to how you would use them in your resolver code.
-
-By awaiting the `FieldDelegate` we are waiting on all other field middleware that might come after the current middleware as well as the actual field resolver, computing the result of the field.
+Field middleware can be defined either as a delegate or as a separate type. In both cases we gain access to a `FieldDelegate` (`next`) and the `IMiddlewareContext`.
 
 ## Field middleware delegate
 
@@ -229,9 +260,13 @@ descriptor
     });
 ```
 
+A middleware can also set or override the result by assigning the `context.Result` property.
+
+> Note: The field resolver will only execute if no result has been produced by one of the preceding field middleware. If any middleware has set the `Result` property on the `IMiddlewareContext`, the field resolver will be skipped.
+
 # Short-circuiting
 
-In some cases we might want to short-circuit the execution of field middleware / the field resolver. For this we can simply not await the `FieldDelegate`.
+In some cases we might want to short-circuit the execution of field middleware / the field resolver. For this we can simply not call the `FieldDelegate` (`next`).
 
 ```csharp
 descriptor
