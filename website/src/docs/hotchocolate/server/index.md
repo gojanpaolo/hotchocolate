@@ -18,12 +18,6 @@ In the case of WebSockets, the interceptor also allows us to handle life cycle e
 
 [Learn more about interceptors](/docs/hotchocolate/server/interceptors)
 
-# Global State
-
-With Global State we can define properties on a per-request basis to be made available to all resolvers and middleware.
-
-[Learn more about Global State](/docs/hotchocolate/server/global-state)
-
 # Introspection
 
 Introspection allows us to query the type system of our GraphQL server using regular GraphQL queries. While this is a powerful feature, enabling all sorts of amazing developer tooling, it can also be used as an attack vector. We will take a look at how we can control who is allowed to issue introspection queries to our GraphQL server.

@@ -147,6 +147,18 @@
               {
                 "path": "field-middleware",
                 "title": "Field middleware"
+              },
+              {
+                "path": "local-state",
+                "title": "Local State"
+              },
+              {
+                "path": "scoped-state",
+                "title": "Scoped State"
+              },
+              {
+                "path": "global-state",
+                "title": "Global State"
               }
             ]
           },
@@ -191,10 +203,6 @@
               {
                 "path": "interceptors",
                 "title": "Interceptors"
-              },
-              {
-                "path": "global-state",
-                "title": "Global State"
               },
               {
                 "path": "introspection",

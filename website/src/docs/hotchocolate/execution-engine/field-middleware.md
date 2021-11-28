@@ -12,7 +12,7 @@ TODO diagram, data middleware, why order matters
 
 Field middleware can be defined either as a delegate or as a separate type. In both cases we gain access to a `FieldDelegate` (`next`) and the `IMiddlewareContext` (`context`).
 
-The `IMiddleware` context implements the `IResolverContext` interface so you can use all of the `IResolverContext` APIs in your middleware, similarly to how you would use them in your resolver code.
+The `IMiddlewareContext` implements the `IResolverContext` interface so you can use all of the `IResolverContext` APIs in your middleware, similarly to how you would use them in your resolver code.
 
 By awaiting the `FieldDelegate` we are waiting on all other field middleware that might come after the current middleware as well as the actual field resolver, computing the result of the field.
 
