@@ -40,14 +40,17 @@ namespace HotChocolate.Subscriptions.InMemory
             await sender.SendAsync("OnMessage", "bar", cts.Token);
             await sender.CompleteAsync("OnMessage");
 
+            var any = false;
             await foreach (IQueryResult response in result.ReadResultsAsync()
                 .WithCancellation(cts.Token))
             {
+                any = true;
                 Assert.Null(response.Errors);
                 Assert.Equal("bar", response.Data!["onMessage"]);
             }
 
             await result.DisposeAsync();
+            Assert.True(any);
         }
 
         public class FooType : InputObjectType
